@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/atuh-client";
 
 
 const loginSchema = z.object({
@@ -46,7 +47,21 @@ export function LoginForm() {
     });
 
     const onSubmit = async (values: LoginFormValues) => {
-        console.log(values);
+        await authClient.signIn.email({
+            email: values.email,
+            password: values.password,
+            callbackURL: "/",
+        },
+        {
+            onSuccess: () => {
+                toast.success("로그인이 완료되었습니다.");
+                router.push("/");
+            },
+            onError: (ctx) => {
+                toast.error(ctx.error.message);
+            },
+        }
+    );
     };
 
     const isPending = form.formState.isSubmitting;
